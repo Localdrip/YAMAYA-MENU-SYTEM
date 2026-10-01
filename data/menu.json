@@ -1,0 +1,335 @@
+{
+  "version": "2026-10-01",
+  "currency": "JPY",
+  "priceNote": "表示価格は税込です",
+  "pages": [
+    {
+      "id": "food",
+      "title": "お料理",
+      "image": "assets/menu/page-food.svg",
+      "hotspots": [
+        {
+          "itemId": "karaage",
+          "x": 5.0,
+          "y": 18.0,
+          "w": 28.0,
+          "h": 36.0
+        },
+        {
+          "itemId": "edamame",
+          "x": 36.0,
+          "y": 18.0,
+          "w": 28.0,
+          "h": 36.0
+        },
+        {
+          "itemId": "dashimaki",
+          "x": 67.0,
+          "y": 18.0,
+          "w": 28.0,
+          "h": 36.0
+        },
+        {
+          "itemId": "sashimi",
+          "x": 5.0,
+          "y": 58.0,
+          "w": 28.0,
+          "h": 36.0
+        },
+        {
+          "itemId": "yakitori",
+          "x": 36.0,
+          "y": 58.0,
+          "w": 28.0,
+          "h": 36.0
+        },
+        {
+          "itemId": "yakionigiri",
+          "x": 67.0,
+          "y": 58.0,
+          "w": 28.0,
+          "h": 36.0
+        }
+      ]
+    },
+    {
+      "id": "drink",
+      "title": "お飲み物",
+      "image": "assets/menu/page-drink.svg",
+      "hotspots": [
+        {
+          "itemId": "beer",
+          "x": 6.0,
+          "y": 18.0,
+          "w": 42.0,
+          "h": 12.0
+        },
+        {
+          "itemId": "highball",
+          "x": 6.0,
+          "y": 33.0,
+          "w": 42.0,
+          "h": 12.0
+        },
+        {
+          "itemId": "lemonsour",
+          "x": 6.0,
+          "y": 48.0,
+          "w": 42.0,
+          "h": 12.0
+        },
+        {
+          "itemId": "ryokuchahi",
+          "x": 6.0,
+          "y": 63.0,
+          "w": 42.0,
+          "h": 12.0
+        },
+        {
+          "itemId": "sake",
+          "x": 6.0,
+          "y": 78.0,
+          "w": 42.0,
+          "h": 12.0
+        },
+        {
+          "itemId": "shochu",
+          "x": 52.0,
+          "y": 18.0,
+          "w": 42.0,
+          "h": 12.0
+        },
+        {
+          "itemId": "nonalcohol",
+          "x": 52.0,
+          "y": 33.0,
+          "w": 42.0,
+          "h": 12.0
+        },
+        {
+          "itemId": "oolong",
+          "x": 52.0,
+          "y": 48.0,
+          "w": 42.0,
+          "h": 12.0
+        },
+        {
+          "itemId": "cola",
+          "x": 52.0,
+          "y": 63.0,
+          "w": 42.0,
+          "h": 12.0
+        },
+        {
+          "itemId": "orange",
+          "x": 52.0,
+          "y": 78.0,
+          "w": 42.0,
+          "h": 12.0
+        }
+      ]
+    }
+  ],
+  "items": {
+    "karaage": {
+      "name": "鶏の唐揚げ",
+      "price": 680,
+      "category": "food",
+      "description": "外はカリッと、中はジューシー。",
+      "options": []
+    },
+    "edamame": {
+      "name": "枝豆",
+      "price": 380,
+      "category": "food",
+      "description": "塩ゆでしたての定番。",
+      "options": []
+    },
+    "dashimaki": {
+      "name": "だし巻き玉子",
+      "price": 580,
+      "category": "food",
+      "description": "注文ごとに焼き上げます。",
+      "options": []
+    },
+    "sashimi": {
+      "name": "刺身盛り合わせ",
+      "price": 1280,
+      "category": "food",
+      "description": "本日の鮮魚を盛り合わせで。",
+      "options": [
+        {
+          "name": "量",
+          "choices": [
+            {
+              "label": "2〜3人前",
+              "price": 0
+            },
+            {
+              "label": "4〜5人前",
+              "price": 900
+            }
+          ]
+        }
+      ]
+    },
+    "yakitori": {
+      "name": "焼き鳥盛り合わせ",
+      "price": 980,
+      "category": "food",
+      "description": "5本盛り。",
+      "options": [
+        {
+          "name": "味付け",
+          "choices": [
+            {
+              "label": "たれ",
+              "price": 0
+            },
+            {
+              "label": "塩",
+              "price": 0
+            }
+          ]
+        }
+      ]
+    },
+    "yakionigiri": {
+      "name": "焼きおにぎり",
+      "price": 450,
+      "category": "food",
+      "description": "〆にどうぞ。2個入り。",
+      "options": []
+    },
+    "beer": {
+      "name": "生ビール",
+      "price": 600,
+      "category": "drink",
+      "description": "",
+      "options": [
+        {
+          "name": "サイズ",
+          "choices": [
+            {
+              "label": "中",
+              "price": 0
+            },
+            {
+              "label": "大",
+              "price": 200
+            }
+          ]
+        }
+      ]
+    },
+    "highball": {
+      "name": "ハイボール",
+      "price": 500,
+      "category": "drink",
+      "description": "",
+      "options": [
+        {
+          "name": "濃さ",
+          "choices": [
+            {
+              "label": "普通",
+              "price": 0
+            },
+            {
+              "label": "濃いめ",
+              "price": 100
+            }
+          ]
+        }
+      ]
+    },
+    "lemonsour": {
+      "name": "レモンサワー",
+      "price": 480,
+      "category": "drink",
+      "description": "",
+      "options": []
+    },
+    "ryokuchahi": {
+      "name": "緑茶ハイ",
+      "price": 480,
+      "category": "drink",
+      "description": "",
+      "options": []
+    },
+    "sake": {
+      "name": "日本酒（1合）",
+      "price": 700,
+      "category": "drink",
+      "description": "",
+      "options": [
+        {
+          "name": "温度",
+          "choices": [
+            {
+              "label": "冷",
+              "price": 0
+            },
+            {
+              "label": "燗",
+              "price": 0
+            }
+          ]
+        }
+      ]
+    },
+    "shochu": {
+      "name": "焼酎",
+      "price": 550,
+      "category": "drink",
+      "description": "",
+      "options": [
+        {
+          "name": "飲み方",
+          "choices": [
+            {
+              "label": "ロック",
+              "price": 0
+            },
+            {
+              "label": "水割り",
+              "price": 0
+            },
+            {
+              "label": "お湯割り",
+              "price": 0
+            }
+          ]
+        }
+      ]
+    },
+    "nonalcohol": {
+      "name": "ノンアルコールビール",
+      "price": 450,
+      "category": "drink",
+      "description": "",
+      "options": []
+    },
+    "oolong": {
+      "name": "ウーロン茶",
+      "price": 300,
+      "category": "drink",
+      "description": "",
+      "options": []
+    },
+    "cola": {
+      "name": "コーラ",
+      "price": 300,
+      "category": "drink",
+      "description": "",
+      "options": []
+    },
+    "orange": {
+      "name": "オレンジジュース",
+      "price": 300,
+      "category": "drink",
+      "description": "",
+      "options": []
+    }
+  }
+}

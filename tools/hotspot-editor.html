@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ホットスポット編集</title>
+  <link rel="stylesheet" href="../common/base.css">
+  <style>
+    body { display: grid; grid-template-columns: 1fr 380px; height: 100vh; overflow: hidden; -webkit-user-select: auto; user-select: auto; }
+    .canvas { overflow: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .bar select, .bar input, aside input, aside select, aside textarea {
+      font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--surface-2); background: var(--bg); color: var(--ink);
+    }
+    .page { position: relative; align-self: flex-start; background: var(--paper); cursor: crosshair; touch-action: none; }
+    .page img { display: block; max-width: 100%; pointer-events: none; }
+    .hs { position: absolute; border: 2px solid var(--accent); background: rgba(200, 85, 61, .2); border-radius: 6px; }
+    .hs.sel { border-color: #ffd34d; background: rgba(255, 211, 77, .25); }
+    .hs span { position: absolute; left: 4px; top: 2px; font-size: 12px; background: #000a; color: #fff; padding: 0 4px; border-radius: 4px; }
+    aside { background: var(--surface); padding: 16px; overflow: auto; display: flex; flex-direction: column; gap: 12px; }
+    aside h2 { margin: 0; font-size: 1.1rem; }
+    aside label { display: flex; flex-direction: column; gap: 4px; font-size: .9rem; color: var(--ink-dim); }
+    aside textarea { min-height: 160px; font-family: ui-monospace, monospace; font-size: 12px; }
+    .row { display: flex; gap: 8px; } .row > * { flex: 1; }
+    .list { font-size: .9rem; } .list div { padding: 6px 8px; border-radius: 6px; cursor: pointer; } .list div.sel { background: var(--surface-2); }
+    .hint { color: var(--ink-dim); font-size: .85rem; margin: 0; }
+    button { min-height: 40px; padding: .5em 1em; }
+  </style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="bar">
+      <select id="pageSel"></select>
+      <button id="addPage">＋ページ追加</button>
+      <label class="hint">画像を差し替え <input type="file" id="imgFile" accept="image/*"></label>
+    </div>
+    <p class="hint">画像上をドラッグしてタップ範囲を作成 → 右側で商品を割り当て。座標は画像に対する % で保存されるため、どの画面サイズでもずれません。</p>
+    <div class="page" id="page"><img id="img" alt=""><div id="layer"></div></div>
+  </div>
+
+  <aside>
+    <h2>ページ設定</h2>
+    <label>ページ名 <input id="pageTitle"></label>
+    <label>画像パス（リポジトリ内） <input id="pageImage" placeholder="assets/menu/page-1.jpg"></label>
+
+    <h2>選択中のホットスポット</h2>
+    <div id="hsForm" class="hint">未選択</div>
+
+    <h2>ホットスポット一覧</h2>
+    <div class="list" id="hsList"></div>
+
+    <h2>書き出し</h2>
+    <p class="hint">menu.json 全体をダウンロードし、data/menu.json に上書きしてください。差し替えた画像は assets/menu/ に置き、上の「画像パス」と同じ名前にします。</p>
+    <div class="row"><button class="primary" id="download">menu.json を保存</button><button id="copy">コピー</button></div>
+    <label>読み込み（JSON を貼り付け） <textarea id="json"></textarea></label>
+    <button id="load">貼り付けた JSON を読み込む</button>
+  </aside>
+
+  <script>
+  (function () {
+    const $ = (s) => document.querySelector(s);
+    let menu, pi = 0, sel = -1;
+    const localImages = {}; // 差し替え画像のプレビュー用（保存はされない）
+
+    fetch('../data/menu.json', { cache: 'no-cache' }).then((r) => r.json()).then((m) => { menu = m; renderAll(); })
+      .catch(() => { menu = { version: '', pages: [{ id: 'p1', title: 'ページ1', image: '', hotspots: [] }], items: {} }; renderAll(); });
+
+    const page = () => menu.pages[pi];
+
+    function renderAll() {
+      $('#pageSel').innerHTML = menu.pages.map((p, i) => `<option value="${i}">${p.title}</option>`).join('');
+      $('#pageSel').value = pi;
+      $('#pageTitle').value = page().title;
+      $('#pageImage').value = page().image;
+      $('#img').src = localImages[pi] || (page().image ? '../' + page().image : '');
+      renderHs();
+    }
+
+    function renderHs() {
+      const p = page();
+      $('#layer').innerHTML = p.hotspots.map((h, i) => {
+        const it = menu.items[h.itemId];
+        return `<div class="hs ${i === sel ? 'sel' : ''}" data-i="${i}" style="left:${h.x}%;top:${h.y}%;width:${h.w}%;height:${h.h}%"><span>${it ? it.name : (h.itemId || '未割当')}</span></div>`;
+      }).join('');
+      $('#hsList').innerHTML = p.hotspots.map((h, i) => `<div data-i="${i}" class="${i === sel ? 'sel' : ''}">${i + 1}. ${(menu.items[h.itemId] || {}).name || h.itemId || '未割当'}　(${h.x}, ${h.y}, ${h.w}×${h.h})</div>`).join('') || '<p class="hint">なし</p>';
+      renderForm();
+      $('#json').value = JSON.stringify(menu, null, 2);
+    }
+
+    function renderForm() {
+      const f = $('#hsForm');
+      const h = page().hotspots[sel];
+      if (!h) { f.className = 'hint'; f.textContent = '未選択'; return; }
+      f.className = '';
+      const it = menu.items[h.itemId] || {};
+      const opts = Object.entries(menu.items).map(([id, x]) => `<option value="${id}" ${id === h.itemId ? 'selected' : ''}>${x.name}（${id}）</option>`).join('');
+      f.innerHTML = `
+        <label>既存の商品を割り当て <select id="fItem"><option value="">— 新規商品 —</option>${opts}</select></label>
+        <div class="row"><label>商品ID <input id="fId" value="${h.itemId || ''}"></label><label>価格 <input id="fPrice" type="number" value="${it.price || ''}"></label></div>
+        <label>商品名 <input id="fName" value="${it.name || ''}"></label>
+        <label>説明 <input id="fDesc" value="${it.description || ''}"></label>
+        <div class="row"><button class="primary" id="fSave">反映</button><button class="danger" id="fDel">削除</button></div>`;
+      $('#fItem').onchange = (e) => { h.itemId = e.target.value; renderHs(); };
+      $('#fSave').onclick = () => {
+        const id = $('#fId').value.trim();
+        if (!id) return alert('商品IDを入力してください（英数字）');
+        const cur = menu.items[id] || { category: page().id, options: [] };
+        menu.items[id] = Object.assign(cur, { name: $('#fName').value.trim() || id, price: Number($('#fPrice').value) || 0, description: $('#fDesc').value.trim() });
+        h.itemId = id; renderHs();
+      };
+      $('#fDel').onclick = () => { page().hotspots.splice(sel, 1); sel = -1; renderHs(); };
+    }
+
+    // ドラッグで矩形作成 / 既存クリックで選択
+    let start = null, temp = null;
+    const pct = (v) => Math.round(v * 10000) / 100;
+    $('#page').addEventListener('pointerdown', (e) => {
+      const hs = e.target.closest('.hs');
+      if (hs) { sel = Number(hs.dataset.i); renderHs(); return; }
+      const r = $('#img').getBoundingClientRect();
+      start = { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height };
+      temp = document.createElement('div'); temp.className = 'hs sel'; $('#layer').appendChild(temp);
+      $('#page').setPointerCapture(e.pointerId);
+    });
+    $('#page').addEventListener('pointermove', (e) => {
+      if (!start) return;
+      const r = $('#img').getBoundingClientRect();
+      const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+      Object.assign(temp.style, { left: Math.min(x, start.x) * 100 + '%', top: Math.min(y, start.y) * 100 + '%', width: Math.abs(x - start.x) * 100 + '%', height: Math.abs(y - start.y) * 100 + '%' });
+      temp.dataset.box = JSON.stringify({ x: pct(Math.min(x, start.x)), y: pct(Math.min(y, start.y)), w: pct(Math.abs(x - start.x)), h: pct(Math.abs(y - start.y)) });
+    });
+    $('#page').addEventListener('pointerup', () => {
+      if (!start) return;
+      const box = temp.dataset.box && JSON.parse(temp.dataset.box);
+      start = null;
+      if (box && box.w > 1 && box.h > 1) { page().hotspots.push(Object.assign({ itemId: '' }, box)); sel = page().hotspots.length - 1; }
+      renderHs();
+    });
+
+    $('#hsList').addEventListener('click', (e) => { const d = e.target.closest('[data-i]'); if (d) { sel = Number(d.dataset.i); renderHs(); } });
+    $('#pageSel').onchange = (e) => { pi = Number(e.target.value); sel = -1; renderAll(); };
+    $('#pageTitle').oninput = (e) => { page().title = e.target.value; $('#pageSel').options[pi].text = e.target.value; $('#json').value = JSON.stringify(menu, null, 2); };
+    $('#pageImage').onchange = (e) => { page().image = e.target.value.trim(); renderAll(); };
+    $('#addPage').onclick = () => { menu.pages.push({ id: 'p' + (menu.pages.length + 1), title: 'ページ' + (menu.pages.length + 1), image: '', hotspots: [] }); pi = menu.pages.length - 1; sel = -1; renderAll(); };
+    $('#imgFile').onchange = (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      localImages[pi] = URL.createObjectURL(f);
+      if (!page().image) page().image = 'assets/menu/' + f.name;
+      renderAll();
+    };
+    $('#download').onclick = () => {
+      menu.version = new Date().toISOString().slice(0, 10);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(menu, null, 2)], { type: 'application/json' }));
+      a.download = 'menu.json'; a.click();
+    };
+    $('#copy').onclick = () => navigator.clipboard.writeText(JSON.stringify(menu, null, 2)).then(() => alert('コピーしました'));
+    $('#load').onclick = () => { try { menu = JSON.parse($('#json').value); pi = 0; sel = -1; renderAll(); } catch (err) { alert('JSON が不正です: ' + err.message); } };
+    document.addEventListener('keydown', (e) => {
+      if ((e.key === 'Delete' || e.key === 'Backspace') && sel >= 0 && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) {
+        page().hotspots.splice(sel, 1); sel = -1; renderHs();
+      }
+    });
+  })();
+  </script>
+</body>
+</html>

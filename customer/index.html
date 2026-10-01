@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1d1712">
+  <title>YAMAYA メニュー</title>
+  <link rel="manifest" href="../manifest-customer.webmanifest">
+  <link rel="icon" href="../assets/icon.svg">
+  <link rel="stylesheet" href="../common/base.css">
+  <link rel="stylesheet" href="customer.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand" id="brand" title="長押しで管理メニュー">YAMAYA</div>
+    <div class="table">テーブル <b id="tableNo">未設定</b></div>
+    <div class="spacer"></div>
+    <span id="net" class="net">接続確認中</span>
+    <button id="btnHistory" class="ghost">注文履歴</button>
+    <button id="btnCall" class="ghost">店員を呼ぶ</button>
+    <button id="btnCart" class="primary">カート <span id="cartCount" class="badge">0</span></button>
+  </header>
+
+  <nav class="pagetabs" id="pageTabs"></nav>
+
+  <main class="stage" id="stage">
+    <button class="pnav prev" id="prevPage" aria-label="前のページ">‹</button>
+    <div class="page" id="page">
+      <img id="pageImg" alt="" draggable="false">
+      <div class="hotspots" id="hotspots"></div>
+    </div>
+    <button class="pnav next" id="nextPage" aria-label="次のページ">›</button>
+  </main>
+
+  <p class="pricenote" id="priceNote"></p>
+
+  <!-- 商品詳細 -->
+  <div class="backdrop hidden" id="itemModal">
+    <div class="modal">
+      <h2 id="itemName"></h2>
+      <p class="desc" id="itemDesc"></p>
+      <div id="itemOptions"></div>
+      <div class="qtyrow">
+        <span>数量</span>
+        <div class="stepper">
+          <button id="qtyMinus">−</button><b id="qty">1</b><button id="qtyPlus">＋</button>
+        </div>
+        <span class="price" id="itemPrice"></span>
+      </div>
+      <div class="actions">
+        <button class="ghost" data-close>閉じる</button>
+        <button class="primary" id="addToCart">カートに入れる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- カート -->
+  <aside class="drawer" id="cart" aria-hidden="true">
+    <div class="drawer-head">
+      <h2>カート</h2>
+      <button class="ghost" id="closeCart">閉じる</button>
+    </div>
+    <ul class="lines" id="cartLines"></ul>
+    <div class="drawer-foot">
+      <div class="total">合計 <b id="cartTotal">¥0</b></div>
+      <button class="primary big" id="placeOrder">注文を確定する</button>
+    </div>
+  </aside>
+
+  <!-- 注文履歴 -->
+  <div class="backdrop hidden" id="historyModal">
+    <div class="modal">
+      <h2>ご注文履歴</h2>
+      <ul class="history" id="historyList"></ul>
+      <div class="total">ご注文合計 <b id="historyTotal">¥0</b></div>
+      <div class="actions">
+        <button class="ghost" data-close>閉じる</button>
+        <button class="primary" id="btnCheckout">お会計をお願いする</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 確認ダイアログ -->
+  <div class="backdrop hidden" id="confirmModal">
+    <div class="modal">
+      <h2 id="confirmTitle"></h2>
+      <p id="confirmBody"></p>
+      <div class="actions">
+        <button class="ghost" data-close>やめる</button>
+        <button class="primary" id="confirmOk">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理メニュー（ロゴ長押し） -->
+  <div class="backdrop hidden" id="adminModal">
+    <div class="modal">
+      <h2>管理メニュー</h2>
+      <div id="adminLock">
+        <p>PIN を入力してください</p>
+        <input id="adminPin" class="input" type="password" inputmode="numeric" autocomplete="off">
+        <div class="actions">
+          <button class="ghost" data-close>閉じる</button>
+          <button class="primary" id="adminUnlock">開く</button>
+        </div>
+      </div>
+      <div id="adminPanel" class="hidden">
+        <label>テーブル番号 <input id="adminTable" class="input" inputmode="numeric"></label>
+        <p class="hint" id="adminInfo"></p>
+        <div class="actions">
+          <button class="danger" id="adminClear">会計済み（履歴・カートを消去）</button>
+          <button class="ghost" id="adminReload">メニュー再読込</button>
+          <button class="primary" id="adminSave">保存して閉じる</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 注文完了 -->
+  <div class="thanks hidden" id="thanks">
+    <div>
+      <p class="big">ご注文ありがとうございます</p>
+      <p id="thanksSub">ただいま厨房へお送りしています。</p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../config.js"></script>
+  <script src="../common/api.js"></script>
+  <script src="../common/sw-register.js"></script>
+  <script src="customer.js"></script>
+</body>
+</html>
