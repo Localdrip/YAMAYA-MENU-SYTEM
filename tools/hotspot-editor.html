@@ -21,7 +21,8 @@
     aside h2 { margin: 0; font-size: 1.1rem; }
     aside label { display: flex; flex-direction: column; gap: 4px; font-size: .9rem; color: var(--ink-dim); }
     aside textarea { min-height: 160px; font-family: ui-monospace, monospace; font-size: 12px; }
-    .row { display: flex; gap: 8px; } .row > * { flex: 1; }
+    .row { display: flex; gap: 8px; } .row > * { flex: 1; min-width: 0; }
+    aside input, aside select { width: 100%; min-width: 0; }
     .list { font-size: .9rem; } .list div { padding: 6px 8px; border-radius: 6px; cursor: pointer; } .list div.sel { background: var(--surface-2); }
     .hint { color: var(--ink-dim); font-size: .85rem; margin: 0; }
     button { min-height: 40px; padding: .5em 1em; }
